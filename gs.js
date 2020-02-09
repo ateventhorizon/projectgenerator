@@ -93,7 +93,7 @@ app.post('/:username/:projecturl', (req, res) => {
   res.send("Hello, world!");
 });
 
-app.post('/:username/:projecturl', (req, res) => {
+app.get('/', (req, res) => {
   res.send( "Follow the white rabbit...");
 });
 
