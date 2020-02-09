@@ -79,10 +79,9 @@ app.put('/:username/:projecturl', async (req, res) => {
       },
     });
 
-    dataJSON = JSON.parse(dataJSON.data);
-    console.log(" IPS: ", dataJSON );
+    console.log(" IPS: ", dataJSON.data.floating_ips[0].droplet );
     let ip = '0.0.0.0';
-    for ( const doip of dataJSON.floating_ips ) {
+    for ( const doip of dataJSON.data.floating_ips ) {
       if ( doip.droplet.name === projecturl ) {
         ip = doip.ip;
       }
