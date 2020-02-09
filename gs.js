@@ -67,7 +67,7 @@ app.put('/:username/:projecturl', async (req, res) => {
     const repo = projecturl;
 
     const path='/v2/floating_ips?page=1&per_page=20';
-    const dataJSON = await axios({
+    let dataJSON = await axios({
       url: 'https://api.digitalocean.com' + path,
       port: 443,
       path: path,
@@ -79,9 +79,10 @@ app.put('/:username/:projecturl', async (req, res) => {
       },
     });
 
+    dataJSON = dataJSON.data.toObjet();
     console.log(" IPS: ", dataJSON.data );
     let ip = '0.0.0.0';
-    for ( const doip of dataJSON.data.floating_ips ) {
+    for ( const doip of dataJSON.floating_ips ) {
       if ( doip.droplet.name === projecturl ) {
         ip = doip.ip;
       }
