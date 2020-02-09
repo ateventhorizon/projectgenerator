@@ -58,7 +58,7 @@ const setSecrets = async (token, username, repo, secrets) => {
 }
 
 
-app.put('secrets/:username/:projecturl', async (req, res) => {
+app.put('/secrets/:username/:projecturl', async (req, res) => {
 
   try {
     const token = process.env.REPO_TOKEN;
