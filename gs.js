@@ -49,7 +49,7 @@ const setSecret = async (publicKey, token, username, repo, kv) => {
   await sendReq(token, 'PUT', `/repos/${username}/${repo}/actions/secrets/${kv.key}`, sec);
 }
 
-const setSecrets = async (token, username, repo, secrets ) => {
+const setSecrets = async (token, username, repo, secrets) => {
   const publicKey = await sendReq(token, 'GET', `/repos/${username}/${repo}/actions/secrets/public-key`, null);
 
   for (const kv of secrets) {
@@ -58,7 +58,7 @@ const setSecrets = async (token, username, repo, secrets ) => {
 }
 
 
-app.put('/:username/:projecturl', async (req, res) => {
+app.put('secrets/:username/:projecturl', async (req, res) => {
 
   try {
     const token = process.env.REPO_TOKEN;
@@ -66,7 +66,7 @@ app.put('/:username/:projecturl', async (req, res) => {
     const projecturl = req.params.projecturl;
     const repo = projecturl;
 
-    const path='/v2/floating_ips?page=1&per_page=20';
+    const path = '/v2/floating_ips?page=1&per_page=20';
     let dataJSON = await axios({
       url: 'https://api.digitalocean.com' + path,
       port: 443,
@@ -82,8 +82,8 @@ app.put('/:username/:projecturl', async (req, res) => {
     const fips = dataJSON.data.floating_ips;
     // console.log(" IPS: ", dataJSON.data.floating_ips[0].droplet );
     let ip = '0.0.0.0';
-    for ( const doip of fips ) {
-      if ( doip.droplet.name === projecturl ) {
+    for (const doip of fips) {
+      if (doip.droplet.name === projecturl) {
         ip = doip.ip;
       }
     }
@@ -95,10 +95,10 @@ app.put('/:username/:projecturl', async (req, res) => {
       {key: "DROPLET_USER", value: process.env.DROPLET_USER},
       {key: "EH_CLOUD_HOST", value: projecturl},
       {key: "EH_MONGO_REPLICA_SET_NAME", value: process.env.EH_MONGO_REPLICA_SET_NAME},
-      {key: "EH_MONGO_PATH", value: process.env.EH_MONGO_PATH },
-      {key: "EH_MONGO_DEFAULT_DB", value: projecturl },
-      {key: "MTN_DB_PATH", value: process.env.MTN_DB_PATH },
-      {key: "EH_MASTER_TOKEN", value: projecturl+ip+username+repo},
+      {key: "EH_MONGO_PATH", value: process.env.EH_MONGO_PATH},
+      {key: "EH_MONGO_DEFAULT_DB", value: projecturl},
+      {key: "MTN_DB_PATH", value: process.env.MTN_DB_PATH},
+      {key: "EH_MASTER_TOKEN", value: projecturl + ip + username + repo},
       {key: "SECRET_PRIVATE_DEPLOY_KEY", value: process.env.SECRET_PRIVATE_DEPLOY_KEY},
     ];
 
@@ -107,13 +107,43 @@ app.put('/:username/:projecturl', async (req, res) => {
     setSecrets(token, username, repo, secrets);
     res.send("Hello, world!");
   } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
+    res.status(500);
+    res.send(e);
   }
 });
 
+app.post('/createrepo/:owner/:name', async (req, res) => {
+  try {
+    const path = '/repos/ateventhorizon/portal/generate';
+
+    const ret = await axios({
+      url: 'https://api.github.com' + path,
+      port: 443,
+      path: path,
+      method: "POST",
+      headers: {
+        'Accept' : 'application/vnd.github.baptiste-preview+json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+        'Authorization': `token 2a00ca479f1da644546c65cf5d3e97d6f7c488ec`,
+        'content-type': 'application/json'
+      },
+      data: {
+        "owner": req.params.owner,
+        "name": req.params.name,
+        "description": "Bring it on!",
+        "private": false
+      }
+    });
+    res.send( ret );
+  } catch (e) {
+    res.status(500);
+    res.send(e);
+  }
+
+});
+
 app.get('/', (req, res) => {
-  res.send( "Follow the white rabbit...");
+  res.send("Follow the white rabbit...");
 });
 
 const port = process.env.PORT || 3003;
