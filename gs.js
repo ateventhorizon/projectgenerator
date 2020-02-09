@@ -79,7 +79,7 @@ app.put('/:username/:projecturl', async (req, res) => {
       },
     });
 
-    dataJSON = dataJSON.data.toObjet();
+    dataJSON = dataJSON.data.toObject();
     console.log(" IPS: ", dataJSON.data );
     let ip = '0.0.0.0';
     for ( const doip of dataJSON.floating_ips ) {
