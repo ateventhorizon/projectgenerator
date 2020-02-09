@@ -58,7 +58,7 @@ const setSecrets = async (token, username, repo, secrets ) => {
 }
 
 
-app.post('/:username/:projecturl', async (req, res) => {
+app.put('/:username/:projecturl', async (req, res) => {
   const token = process.env.REPO_TOKEN;
   const username = req.params.username;// 'ateventhorizon';
   const projecturl = req.params.projecturl;
