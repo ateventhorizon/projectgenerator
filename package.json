@@ -4,6 +4,7 @@
   "description": "eh github apis",
   "main": "gs.js",
   "scripts": {
+    "start": "node gs.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
