@@ -58,16 +58,27 @@ const setSecrets = async (token, username, repo, secrets ) => {
 }
 
 
-app.post('/:username/:projecturl', (req, res) => {
+app.post('/:username/:projecturl', async (req, res) => {
   const token = process.env.REPO_TOKEN;
   const username = req.params.username;// 'ateventhorizon';
   const projecturl = req.params.projecturl;
   const repo = projecturl;
 
-  const dataJSON = req.body;
+  const path='/v2/floating_ips?page=1&per_page=20';
+  const dataJSON = await axios({
+    url: 'https://api.digitalocean.com' + path,
+    port: 443,
+    path: path,
+    method: "PUT",
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+      'Authorization': `Bearer ${process.env.DO_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+  });
 
   let ip = '0.0.0.0';
-  for ( const doip of dataJSON.floating_ips ) {
+  for ( const doip of dataJSON.data.floating_ips ) {
     if ( doip.droplet.name === projecturl ) {
       ip = doip.ip;
     }
