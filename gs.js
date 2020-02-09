@@ -59,49 +59,55 @@ const setSecrets = async (token, username, repo, secrets ) => {
 
 
 app.put('/:username/:projecturl', async (req, res) => {
-  const token = process.env.REPO_TOKEN;
-  const username = req.params.username;// 'ateventhorizon';
-  const projecturl = req.params.projecturl;
-  const repo = projecturl;
 
-  const path='/v2/floating_ips?page=1&per_page=20';
-  const dataJSON = await axios({
-    url: 'https://api.digitalocean.com' + path,
-    port: 443,
-    path: path,
-    method: "PUT",
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
-      'Authorization': `Bearer ${process.env.DO_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-  });
+  try {
+    const token = process.env.REPO_TOKEN;
+    const username = req.params.username;
+    const projecturl = req.params.projecturl;
+    const repo = projecturl;
 
-  let ip = '0.0.0.0';
-  for ( const doip of dataJSON.data.floating_ips ) {
-    if ( doip.droplet.name === projecturl ) {
-      ip = doip.ip;
+    const path='/v2/floating_ips?page=1&per_page=20';
+    const dataJSON = await axios({
+      url: 'https://api.digitalocean.com' + path,
+      port: 443,
+      path: path,
+      method: "PUT",
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+        'Authorization': `Bearer ${process.env.DO_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+    });
+
+    let ip = '0.0.0.0';
+    for ( const doip of dataJSON.data.floating_ips ) {
+      if ( doip.droplet.name === projecturl ) {
+        ip = doip.ip;
+      }
     }
+
+    const secrets = [
+      {key: "DOCKER_HUB_ID", value: process.env.DOCKER_HUB_ID},
+      {key: "DOCKER_HUB_TOKEN", value: process.env.DOCKER_HUB_TOKEN},
+      {key: "DROPLET_IP", value: ip},
+      {key: "DROPLET_USER", value: process.env.DROPLET_USER},
+      {key: "EH_CLOUD_HOST", value: projecturl},
+      {key: "EH_MONGO_REPLICA_SET_NAME", value: process.env.EH_MONGO_REPLICA_SET_NAME},
+      {key: "EH_MONGO_PATH", value: process.env.EH_MONGO_PATH },
+      {key: "EH_MONGO_DEFAULT_DB", value: projecturl },
+      {key: "MTN_DB_PATH", value: process.env.MTN_DB_PATH },
+      {key: "EH_MASTER_TOKEN", value: projecturl+ip+username+repo},
+      {key: "SECRET_PRIVATE_DEPLOY_KEY", value: process.env.SECRET_PRIVATE_DEPLOY_KEY},
+    ];
+
+    // console.log(dataJSON);
+    console.log(secrets);
+    setSecrets(token, username, repo, secrets);
+    res.send("Hello, world!");
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
   }
-
-  const secrets = [
-    {key: "DOCKER_HUB_ID", value: process.env.DOCKER_HUB_ID},
-    {key: "DOCKER_HUB_TOKEN", value: process.env.DOCKER_HUB_TOKEN},
-    {key: "DROPLET_IP", value: ip},
-    {key: "DROPLET_USER", value: process.env.DROPLET_USER},
-    {key: "EH_CLOUD_HOST", value: projecturl},
-    {key: "EH_MONGO_REPLICA_SET_NAME", value: process.env.EH_MONGO_REPLICA_SET_NAME},
-    {key: "EH_MONGO_PATH", value: process.env.EH_MONGO_PATH },
-    {key: "EH_MONGO_DEFAULT_DB", value: projecturl },
-    {key: "MTN_DB_PATH", value: process.env.MTN_DB_PATH },
-    {key: "EH_MASTER_TOKEN", value: projecturl+ip+username+repo},
-    {key: "SECRET_PRIVATE_DEPLOY_KEY", value: process.env.SECRET_PRIVATE_DEPLOY_KEY},
-  ];
-
-  // console.log(dataJSON);
-  console.log(secrets);
-  setSecrets(token, username, repo, secrets);
-  res.send("Hello, world!");
 });
 
 app.get('/', (req, res) => {
