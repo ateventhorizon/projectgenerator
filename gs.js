@@ -77,6 +77,7 @@ const gitHubAPI = async (verb, path, data = null, ct = 'application/json') => {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
         'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+        'Accept': '*.*;application/vnd.github.baptiste-preview+json',
         'Content-Type': ct
       },
       data: data
@@ -108,24 +109,30 @@ const setSecret = async (publicKey, username, repo, kv) => {
     });
 
     await gitHubAPI('PUT', `/repos/${username}/${repo}/actions/secrets/${kv.key}`, sec);
+    return "Adding " + kv.key + "\n";
   } catch (e) {
-    console.log(e);
+    throw(e);
   }
 }
 
 const setSecrets = async (username, repo, secrets) => {
-  const publicKey = await gitHubAPI('GET', `/repos/${username}/${repo}/actions/secrets/public-key`);
+  try {
+    const publicKey = await gitHubAPI('GET', `/repos/${username}/${repo}/actions/secrets/public-key`);
 
-  for (const kv of secrets) {
-    setSecret(publicKey.data, token, username, repo, kv);
+    let secretLog = "";
+    for (const kv of secrets) {
+      secretLog += await setSecret(publicKey, username, repo, kv);
+    }
+    return secretLog;
+  } catch (e) {
+    throw(e);
   }
 }
 
 
-app.put('/secrets/:username/:projecturl', async (req, res) => {
+app.post('/secrets/:username/:projecturl', async (req, res) => {
 
   try {
-    const token = process.env.REPO_TOKEN;
     const username = req.params.username;
     const projecturl = req.params.projecturl;
     const repo = projecturl;
@@ -156,10 +163,9 @@ app.put('/secrets/:username/:projecturl', async (req, res) => {
       {key: "SECRET_PRIVATE_DEPLOY_KEY", value: process.env.SECRET_PRIVATE_DEPLOY_KEY},
     ];
 
-    // console.log(dataJSON);
-    console.log(secrets);
-    setSecrets(token, username, repo, secrets);
-    res.send("Hello, world!");
+    // console.log(secrets);
+    const logs = await setSecrets(username, repo, secrets);
+    res.send(logs);
   } catch (e) {
     res.status(500);
     res.send(e);
@@ -337,11 +343,11 @@ echo -e "
 cd /docker/letsencrypt-docker-nginx/src/letsencrypt
 sudo docker-compose up -d
 
-sudo docker run -it --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --webroot --register-unsafely-without-email --agree-tos --webroot-path=/data/letsencrypt --staging  -d ${projecturl} -d www.${projecturl}
+sudo docker run -it --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --webroot --register-unsafely-without-email --agree-tos --webroot-path=/data/letsencrypt --staging -d ${projecturl} -d www.${projecturl} > /sslstaging.log
 
 sudo rm -rf /docker-volumes/
 
-sudo docker run -it --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --webroot --email messingaroundbigtime@gmail.com --agree-tos --no-eff-email --webroot-path=/data/letsencrypt -d ${projecturl} -d www.${projecturl}
+#sudo docker run -it --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --webroot --email messingaroundbigtime@gmail.com --agree-tos --no-eff-email --webroot-path=/data/letsencrypt -d ${projecturl} -d www.${projecturl}
 
 # sudo openssl dhparam -out ~/dhparam-2048.pem 2048
 
@@ -351,13 +357,13 @@ sudo cp /docker-volumes/etc/letsencrypt/live/${projecturl}/fullchain.pem /sslcer
 
 # Allocate floating IP and rewrite A records
 
-curl -X POST https://ehdevops.herokuapp.com/floatingips/assign/${projecturl}
-curl -X PUT https://ehdevops.herokuapp.com/floatingips/domainrecord_a/${projecturl}
+curl -X POST https://ehdevops.herokuapp.com/floatingips/assign/${projecturl} > /floatingips_assign.log
+curl -X PUT https://ehdevops.herokuapp.com/floatingips/domainrecord_a/${projecturl} > /domainrecord_a.log
 
 # boostrap github project
 
-curl -X POST https://ehdevops.herokuapp.com/createrepo/${username}/${projecturl}
-curl -X POST https://ehdevops.herokuapp.com/secrets/${username}/${projecturl}
+curl -X POST https://ehdevops.herokuapp.com/createrepo/${username}/${projecturl} > /createrepo.log
+curl -X POST https://ehdevops.herokuapp.com/secrets/${username}/${projecturl} > /createsecrets.log
 `,
         "private_networking": null,
         "volumes": null,
