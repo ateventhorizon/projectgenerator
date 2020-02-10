@@ -290,6 +290,11 @@ sudo ufw allow 443
 
 curl -X POST https://ehdevops.herokuapp.com/domains/${projecturl}
 
+# Allocate floating IP and rewrite A records
+curl -X POST https://ehdevops.herokuapp.com/floatingips/assign/${projecturl} > /floatingips_assign.log
+sleep 10
+curl -X PUT https://ehdevops.herokuapp.com/floatingips/domainrecord_a/${projecturl} > /domainrecord_a.log
+
 sudo mkdir -p /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site
 
 echo -e "version: '3.1'
@@ -314,7 +319,7 @@ networks:
 echo -e "server {
     listen 80;
     listen [::]:80;
-    server_name doublecanny.com www.${projecturl};
+    server_name ${projecturl} www.${projecturl};
 
     location ~ /.well-known/acme-challenge {
         allow all;
@@ -356,12 +361,6 @@ sudo rm -rf /docker-volumes/
 sudo mkdir /sslcerts
 sudo cp /docker-volumes/etc/letsencrypt/live/${projecturl}/privkey.pem /sslcerts/
 sudo cp /docker-volumes/etc/letsencrypt/live/${projecturl}/fullchain.pem /sslcerts/
-
-# Allocate floating IP and rewrite A records
-
-curl -X POST https://ehdevops.herokuapp.com/floatingips/assign/${projecturl} > /floatingips_assign.log
-sleep 10
-curl -X PUT https://ehdevops.herokuapp.com/floatingips/domainrecord_a/${projecturl} > /domainrecord_a.log
 
 # boostrap github project
 
