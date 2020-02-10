@@ -337,30 +337,11 @@ echo -e "
 cd /docker/letsencrypt-docker-nginx/src/letsencrypt
 sudo docker-compose up -d
 
-sudo docker run -it --rm \\
--v /docker-volumes/etc/letsencrypt:/etc/letsencrypt \\
--v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt \\
--v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt \\
--v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" \\
-certbot/certbot \\
-certonly --webroot \\
---register-unsafely-without-email --agree-tos \\
---webroot-path=/data/letsencrypt \\
---staging \\
--d ${projecturl} -d www.${projecturl}
+sudo docker run -it --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --webroot --register-unsafely-without-email --agree-tos --webroot-path=/data/letsencrypt --staging  -d ${projecturl} -d www.${projecturl}
 
 sudo rm -rf /docker-volumes/
 
-sudo docker run -it --rm \\
--v /docker-volumes/etc/letsencrypt:/etc/letsencrypt \\
--v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt \\
--v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt \\
--v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" \\
-certbot/certbot \\
-certonly --webroot \\
---email messingaroundbigtime@gmail.com --agree-tos --no-eff-email \\
---webroot-path=/data/letsencrypt \\
--d ${projecturl} -d www.${projecturl}
+sudo docker run -it --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --webroot --email messingaroundbigtime@gmail.com --agree-tos --no-eff-email --webroot-path=/data/letsencrypt -d ${projecturl} -d www.${projecturl}
 
 # sudo openssl dhparam -out ~/dhparam-2048.pem 2048
 
