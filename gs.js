@@ -157,7 +157,7 @@ app.post('/secrets/:username/:projecturl', async (req, res) => {
       {key: "EH_CLOUD_HOST", value: projecturl},
       {key: "EH_MONGO_REPLICA_SET_NAME", value: process.env.EH_MONGO_REPLICA_SET_NAME},
       {key: "EH_MONGO_PATH", value: process.env.EH_MONGO_PATH},
-      {key: "EH_MONGO_DEFAULT_DB", value: projecturl},
+      {key: "EH_MONGO_DEFAULT_DB", value: process.env.EH_MONGO_DEFAULT_DB},
       {key: "MTN_DB_PATH", value: process.env.MTN_DB_PATH},
       {key: "EH_MASTER_TOKEN", value: projecturl + ip + username + repo},
       {key: "SECRET_PRIVATE_DEPLOY_KEY", value: process.env.SECRET_PRIVATE_DEPLOY_KEY},
