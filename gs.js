@@ -290,11 +290,6 @@ sudo ufw allow 443
 
 curl -X POST https://ehdevops.herokuapp.com/domains/${projecturl}
 
-# Allocate floating IP and rewrite A records
-curl -X POST https://ehdevops.herokuapp.com/floatingips/assign/${projecturl} > /floatingips_assign.log
-sleep 10
-curl -X PUT https://ehdevops.herokuapp.com/floatingips/domainrecord_a/${projecturl} > /domainrecord_a.log
-
 sudo mkdir -p /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site
 
 echo -e "version: '3.1'
@@ -348,10 +343,11 @@ echo -e "
 cd /docker/letsencrypt-docker-nginx/src/letsencrypt
 sudo docker-compose up -d
 
+sleep 10
 docker ps > /dockerps.log
-sudo docker run --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --non-interactive --webroot --register-unsafely-without-email --agree-tos --webroot-path=/data/letsencrypt --staging -d ${projecturl} -d www.${projecturl} > /sslstaging.log
+#sudo docker run --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --non-interactive --webroot --register-unsafely-without-email --agree-tos --webroot-path=/data/letsencrypt --staging -d ${projecturl} -d www.${projecturl} > /sslstaging.log
 
-sudo rm -rf /docker-volumes/
+#sudo rm -rf /docker-volumes/
 
 sudo docker run --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --non-interactive --webroot --email messingaroundbigtime@gmail.com --agree-tos --no-eff-email --webroot-path=/data/letsencrypt -d ${projecturl} -d www.${projecturl} > /sslforreal.log
 
@@ -360,6 +356,13 @@ sudo docker run --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /doc
 sudo mkdir /sslcerts
 sudo cp /docker-volumes/etc/letsencrypt/live/${projecturl}/privkey.pem /sslcerts/
 sudo cp /docker-volumes/etc/letsencrypt/live/${projecturl}/fullchain.pem /sslcerts/
+
+sudo docker-compose down
+
+# Allocate floating IP and rewrite A records
+curl -X POST https://ehdevops.herokuapp.com/floatingips/assign/${projecturl} > /floatingips_assign.log
+sleep 10
+curl -X PUT https://ehdevops.herokuapp.com/floatingips/domainrecord_a/${projecturl} > /domainrecord_a.log
 
 # boostrap github project
 
