@@ -353,7 +353,7 @@ sudo docker run --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /doc
 
 sudo rm -rf /docker-volumes/
 
-#sudo docker run --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --non-interactive --webroot --email messingaroundbigtime@gmail.com --agree-tos --no-eff-email --webroot-path=/data/letsencrypt -d ${projecturl} -d www.${projecturl}
+sudo docker run --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --non-interactive --webroot --email messingaroundbigtime@gmail.com --agree-tos --no-eff-email --webroot-path=/data/letsencrypt -d ${projecturl} -d www.${projecturl} > /sslforreal.log
 
 # sudo openssl dhparam -out ~/dhparam-2048.pem 2048
 
