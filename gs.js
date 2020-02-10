@@ -348,13 +348,12 @@ echo -e "
 cd /docker/letsencrypt-docker-nginx/src/letsencrypt
 sudo docker-compose up -d
 
-sleep 15
 docker ps > /dockerps.log
-sudo docker run -it --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --webroot --register-unsafely-without-email --agree-tos --webroot-path=/data/letsencrypt --staging -d ${projecturl} -d www.${projecturl} > /sslstaging.log
+sudo docker run --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --non-interactive --webroot --register-unsafely-without-email --agree-tos --webroot-path=/data/letsencrypt --staging -d ${projecturl} -d www.${projecturl} > /sslstaging.log
 
 sudo rm -rf /docker-volumes/
 
-#sudo docker run -it --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --webroot --email messingaroundbigtime@gmail.com --agree-tos --no-eff-email --webroot-path=/data/letsencrypt -d ${projecturl} -d www.${projecturl}
+#sudo docker run --rm -v /docker-volumes/etc/letsencrypt:/etc/letsencrypt -v /docker-volumes/var/lib/letsencrypt:/var/lib/letsencrypt -v /docker/letsencrypt-docker-nginx/src/letsencrypt/letsencrypt-site:/data/letsencrypt -v "/docker-volumes/var/log/letsencrypt:/var/log/letsencrypt" certbot/certbot certonly --non-interactive --webroot --email messingaroundbigtime@gmail.com --agree-tos --no-eff-email --webroot-path=/data/letsencrypt -d ${projecturl} -d www.${projecturl}
 
 # sudo openssl dhparam -out ~/dhparam-2048.pem 2048
 
