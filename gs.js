@@ -360,6 +360,7 @@ sudo cp /docker-volumes/etc/letsencrypt/live/${projecturl}/fullchain.pem /sslcer
 # Allocate floating IP and rewrite A records
 
 curl -X POST https://ehdevops.herokuapp.com/floatingips/assign/${projecturl} > /floatingips_assign.log
+sleep 10
 curl -X PUT https://ehdevops.herokuapp.com/floatingips/domainrecord_a/${projecturl} > /domainrecord_a.log
 
 # boostrap github project
