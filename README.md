@@ -1,2 +1,2 @@
 # projectgenerator
-This will take care of bootstrapping a fully pledged Event Horizon project
+This will take care of bootstrapping a fully fledged Event Horizon project
