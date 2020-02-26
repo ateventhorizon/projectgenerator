@@ -253,7 +253,7 @@ app.get('/droplets/ip/:name', async (req, res) => {
   });
 });
 
-app.post('/droplets/:name/:username', async (req, res) => {
+app.post('/createproject/:name/:size/:username', async (req, res) => {
   exec(req, res, async () => {
     const ks = await digitalOceanAPI("GET", '/v2/account/keys');
     const key = findMasterSSHKey(ks.ssh_keys);
@@ -265,7 +265,7 @@ app.post('/droplets/:name/:username', async (req, res) => {
       {
         "name": req.params.name,
         "region": "lon1",
-        "size": "s-1vcpu-1gb",
+        "size": req.params.size,
         "image": "50944795",
         "ssh_keys": [
           key
