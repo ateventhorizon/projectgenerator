@@ -161,6 +161,10 @@ app.post('/secrets/:username/:projecturl', async (req, res) => {
       {key: "MTN_DB_PATH", value: process.env.MTN_DB_PATH},
       {key: "EH_MASTER_TOKEN", value: projecturl + ip + username + repo},
       {key: "SECRET_PRIVATE_DEPLOY_KEY", value: process.env.SECRET_PRIVATE_DEPLOY_KEY},
+      {key: "EH_SEND_GRID_TOKEN", value: process.env.SEND_GRID},
+      {key: "EH_TOKEN_COOKIE", value: process.env.EH_TOKEN_COOKIE},
+      {key: "EH_ANTIFORGERYTOKEN_COOKIE", value: process.env.EH_ANTIFORGERYTOKEN_COOKIE},
+      {key: "EH_JWT_EXPIRES_SECONDS", value: process.env.EH_JWT_EXPIRES_SECONDS},
     ];
 
     // console.log(secrets);
@@ -441,7 +445,7 @@ app.put('/floatingips/domainrecord_a/:name', async (req, res) => {
 
 app.post('/createrepo/:owner/:name', async (req, res) => {
   try {
-    const path = '/repos/ateventhorizon/portal/generate';
+    const path = '/repos/trends-bar/trends.bar/generate';
 
     const ret = await gitHubAPI("POST", path,
       {
